@@ -41,10 +41,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ConcurrentSkipList.cs" />
-    <Compile Include="ConcurrentSkipListHeadNode.cs" />
-    <Compile Include="ConcurrentSkipListNode.cs" />
-    <Compile Include="IConcurrentSkipListNode.cs" />
+    <Compile Include="ConcurrentSkipListMap.cs" />
+    <Compile Include="ConcurrentSkipListMapHeadNode.cs" />
+    <Compile Include="ConcurrentSkipListMapNode.cs" />
+    <Compile Include="IConcurrentSkipListMapNode.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

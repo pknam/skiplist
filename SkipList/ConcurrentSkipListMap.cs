@@ -10,13 +10,13 @@ namespace SkipList
 
         private readonly Double p;
         private readonly Random random;
-        private readonly ConcurrentSkipListHeadNode head;
+        private readonly ConcurrentSkipListMapHeadNode head;
 
         public ConcurrentSkipListMap(Double p = 0.5)
         {
             this.p = p;
             random = new Random(0x0d0ffFED);
-            head = new ConcurrentSkipListHeadNode(MAX_FORWARD_LENGTH);
+            head = new ConcurrentSkipListMapHeadNode(MAX_FORWARD_LENGTH);
         }
 
         public Boolean TryGetValue(Int32 key, out Int32 value)
@@ -52,11 +52,11 @@ namespace SkipList
         public void Add(Int32 key, Int32 value)
         {
             var forwardLength = NewForwardLength();
-            var newNode = new ConcurrentSkipListNode(forwardLength) { Key = key, Value = value };
+            var newNode = new ConcurrentSkipListMapNode(forwardLength) { Key = key, Value = value };
             var backlook = GenerateInitialBacklook();
 
             var nextIndex = TraverseNextStep(head.Forwards, key);
-            IConcurrentSkipListNode traverseNode = head;
+            IConcurrentSkipListMapNode traverseNode = head;
 
             while (nextIndex != null)
             {
@@ -67,7 +67,7 @@ namespace SkipList
 
                 traverseNode = traverseNode.Forwards[nextIndex.Value];
 
-                if ((traverseNode as ConcurrentSkipListNode).Key == key)
+                if ((traverseNode as ConcurrentSkipListMapNode).Key == key)
                 {
                     throw new ArgumentException("the key already exists", nameof(key));
                 }
@@ -101,7 +101,7 @@ namespace SkipList
             return TryGetValue(key, out var value);
         }
 
-        private Int32? TraverseNextStep(ConcurrentSkipListNode[] forwards, Int32 targetKey)
+        private Int32? TraverseNextStep(ConcurrentSkipListMapNode[] forwards, Int32 targetKey)
         {
             if (forwards == null)
             {
@@ -135,9 +135,9 @@ namespace SkipList
             return MAX_FORWARD_LENGTH;
         }
 
-        private IConcurrentSkipListNode[] GenerateInitialBacklook()
+        private IConcurrentSkipListMapNode[] GenerateInitialBacklook()
         {
-            var backlook = new IConcurrentSkipListNode[head.Forwards.Length];
+            var backlook = new IConcurrentSkipListMapNode[head.Forwards.Length];
             for (var i = 0; i < backlook.Length; i++)
             {
                 backlook[i] = head;

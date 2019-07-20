@@ -2,148 +2,148 @@
 
 namespace SkipList
 {
-	// todo: support concurrency
-	// todo: implement IDictionary<TKey, TValue>, ICollection<KeyValuePair<TKey, TValue>>, IEnumerable<KeyValuePair<TKey, TValue>, IEnumerable
-	public class ConcurrentSkipListMap
-	{
-		public static Int32 MAX_FORWARD_LENGTH = 20;
+    // todo: support concurrency
+    // todo: implement IDictionary<TKey, TValue>, ICollection<KeyValuePair<TKey, TValue>>, IEnumerable<KeyValuePair<TKey, TValue>, IEnumerable
+    public class ConcurrentSkipListMap
+    {
+        public static Int32 MAX_FORWARD_LENGTH = 20;
 
-		private readonly Double p;
-		private readonly Random random;
-		private readonly ConcurrentSkipListHeadNode head;
+        private readonly Double p;
+        private readonly Random random;
+        private readonly ConcurrentSkipListHeadNode head;
 
-		public ConcurrentSkipListMap(Double p = 0.5)
-		{
-			this.p = p;
-			random = new Random(0x0d0ffFED);
-			head = new ConcurrentSkipListHeadNode(MAX_FORWARD_LENGTH);
-		}
+        public ConcurrentSkipListMap(Double p = 0.5)
+        {
+            this.p = p;
+            random = new Random(0x0d0ffFED);
+            head = new ConcurrentSkipListHeadNode(MAX_FORWARD_LENGTH);
+        }
 
-		public Boolean TryGetValue(Int32 key, out Int32 value)
-		{
-			var initialNextIndex = TraverseNextStep(head.Forwards, key);
-			if (initialNextIndex == null)
-			{
-				value = 0;
-				return false;
-			}
+        public Boolean TryGetValue(Int32 key, out Int32 value)
+        {
+            var initialNextIndex = TraverseNextStep(head.Forwards, key);
+            if (initialNextIndex == null)
+            {
+                value = 0;
+                return false;
+            }
 
-			var node = head.Forwards[initialNextIndex.Value];
+            var node = head.Forwards[initialNextIndex.Value];
 
-			while (true)
-			{
-				if (node.Key == key)
-				{
-					value = node.Value;
-					return true;
-				}
+            while (true)
+            {
+                if (node.Key == key)
+                {
+                    value = node.Value;
+                    return true;
+                }
 
-				var nextIndex = TraverseNextStep(node.Forwards, key);
-				if (nextIndex == null)
-				{
-					value = 0;
-					return false;
-				}
+                var nextIndex = TraverseNextStep(node.Forwards, key);
+                if (nextIndex == null)
+                {
+                    value = 0;
+                    return false;
+                }
 
-				node = node.Forwards[nextIndex.Value];
-			}
-		}
+                node = node.Forwards[nextIndex.Value];
+            }
+        }
 
-		public void Add(Int32 key, Int32 value)
-		{
-			var forwardLength = NewForwardLength();
-			var newNode = new ConcurrentSkipListNode(forwardLength) { Key = key, Value = value };
-			var backlook = GenerateInitialBacklook();
+        public void Add(Int32 key, Int32 value)
+        {
+            var forwardLength = NewForwardLength();
+            var newNode = new ConcurrentSkipListNode(forwardLength) { Key = key, Value = value };
+            var backlook = GenerateInitialBacklook();
 
-			var nextIndex = TraverseNextStep(head.Forwards, key);
-			IConcurrentSkipListNode traverseNode = head;
+            var nextIndex = TraverseNextStep(head.Forwards, key);
+            IConcurrentSkipListNode traverseNode = head;
 
-			while (nextIndex != null)
-			{
-				for (var i = nextIndex.Value; i < traverseNode.Forwards.Length; i++)
-				{
-					backlook[i] = traverseNode;
-				}
+            while (nextIndex != null)
+            {
+                for (var i = nextIndex.Value; i < traverseNode.Forwards.Length; i++)
+                {
+                    backlook[i] = traverseNode;
+                }
 
-				traverseNode = traverseNode.Forwards[nextIndex.Value];
-				
-				if ((traverseNode as ConcurrentSkipListNode).Key == key)
-				{
-					throw new ArgumentException("the key already exists", nameof(key));
-				}
+                traverseNode = traverseNode.Forwards[nextIndex.Value];
 
-				nextIndex = TraverseNextStep(traverseNode.Forwards, key);
-			}
+                if ((traverseNode as ConcurrentSkipListNode).Key == key)
+                {
+                    throw new ArgumentException("the key already exists", nameof(key));
+                }
 
-			for (var i = 0; i < traverseNode.Forwards.Length; i++)
-			{
-				backlook[i] = traverseNode;
-			}
+                nextIndex = TraverseNextStep(traverseNode.Forwards, key);
+            }
 
-			for (var i = 0; i < forwardLength; i++)
-			{
-				var prevNode = backlook[i];
-				var nextNode = prevNode?.Forwards[i];
+            for (var i = 0; i < traverseNode.Forwards.Length; i++)
+            {
+                backlook[i] = traverseNode;
+            }
 
-				newNode.Forwards[i] = nextNode;
-				prevNode.Forwards[i] = newNode;
-			}
-		}
+            for (var i = 0; i < forwardLength; i++)
+            {
+                var prevNode = backlook[i];
+                var nextNode = prevNode?.Forwards[i];
 
-		public bool Remove(Int32 key)
-		{
-			// todo
-			return true;
-		}
+                newNode.Forwards[i] = nextNode;
+                prevNode.Forwards[i] = newNode;
+            }
+        }
 
-		public bool ContainsKey(Int32 key)
-		{
-			return TryGetValue(key, out var value);
-		}
+        public bool Remove(Int32 key)
+        {
+            // todo
+            return true;
+        }
 
-		private Int32? TraverseNextStep(ConcurrentSkipListNode[] forwards, Int32 targetKey)
-		{
-			if (forwards == null)
-			{
-				throw new ArgumentNullException();
-			}
+        public bool ContainsKey(Int32 key)
+        {
+            return TryGetValue(key, out var value);
+        }
 
-			for (var i = forwards.Length - 1; 0 <= i; i--)
-			{
-				if (forwards[i]?.Key <= targetKey)
-				{
-					return i;
-				}
-			}
+        private Int32? TraverseNextStep(ConcurrentSkipListNode[] forwards, Int32 targetKey)
+        {
+            if (forwards == null)
+            {
+                throw new ArgumentNullException();
+            }
 
-			return null;
-		}
+            for (var i = forwards.Length - 1; 0 <= i; i--)
+            {
+                if (forwards[i]?.Key <= targetKey)
+                {
+                    return i;
+                }
+            }
 
-		private Int32 NewForwardLength()
-		{
-			var r = random.NextDouble();
+            return null;
+        }
 
-			for (var length = 1; length <= MAX_FORWARD_LENGTH; length++)
-			{
-				if (Math.Pow(p, length) < r)
-				{
-					Console.WriteLine(length);
-					return length;
-				}
-			}
+        private Int32 NewForwardLength()
+        {
+            var r = random.NextDouble();
 
-			return MAX_FORWARD_LENGTH;
-		}
+            for (var length = 1; length <= MAX_FORWARD_LENGTH; length++)
+            {
+                if (Math.Pow(p, length) < r)
+                {
+                    Console.WriteLine(length);
+                    return length;
+                }
+            }
 
-		private IConcurrentSkipListNode[] GenerateInitialBacklook()
-		{
-			var backlook = new IConcurrentSkipListNode[head.Forwards.Length];
-			for (var i = 0; i < backlook.Length; i++)
-			{
-				backlook[i] = head;
-			}
+            return MAX_FORWARD_LENGTH;
+        }
 
-			return backlook;
-		}
-	}
+        private IConcurrentSkipListNode[] GenerateInitialBacklook()
+        {
+            var backlook = new IConcurrentSkipListNode[head.Forwards.Length];
+            for (var i = 0; i < backlook.Length; i++)
+            {
+                backlook[i] = head;
+            }
+
+            return backlook;
+        }
+    }
 }

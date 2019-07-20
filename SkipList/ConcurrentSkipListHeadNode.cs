@@ -2,13 +2,13 @@
 
 namespace SkipList
 {
-	class ConcurrentSkipListHeadNode : IConcurrentSkipListNode
-	{
-		public ConcurrentSkipListNode[] Forwards { get; set; }
+    class ConcurrentSkipListHeadNode : IConcurrentSkipListNode
+    {
+        public ConcurrentSkipListNode[] Forwards { get; set; }
 
-		public ConcurrentSkipListHeadNode(Int32 forwardSize)
-		{
-			Forwards = new ConcurrentSkipListNode[forwardSize];
-		}
-	}
+        public ConcurrentSkipListHeadNode(Int32 forwardSize)
+        {
+            Forwards = new ConcurrentSkipListNode[forwardSize];
+        }
+    }
 }

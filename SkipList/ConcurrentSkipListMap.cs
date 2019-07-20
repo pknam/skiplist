@@ -21,32 +21,23 @@ namespace SkipList
 
         public Boolean TryGetValue(Int32 key, out Int32 value)
         {
-            var initialNextIndex = TraverseNextStep(head.Forwards, key);
-            if (initialNextIndex == null)
+            IConcurrentSkipListMapNode traverseNode = head;
+            var nextIndex = TraverseNextStep(traverseNode.Forwards, key);
+            while (nextIndex != null)
             {
-                value = 0;
-                return false;
-            }
+                traverseNode = traverseNode.Forwards[nextIndex.Value];
 
-            var node = head.Forwards[initialNextIndex.Value];
-
-            while (true)
-            {
-                if (node.Key == key)
+                if (traverseNode is ConcurrentSkipListMapNode node && node.Key == key)
                 {
                     value = node.Value;
                     return true;
                 }
 
-                var nextIndex = TraverseNextStep(node.Forwards, key);
-                if (nextIndex == null)
-                {
-                    value = 0;
-                    return false;
-                }
-
-                node = node.Forwards[nextIndex.Value];
+                nextIndex = TraverseNextStep(traverseNode.Forwards, key);
             }
+
+            value = 0;
+            return false;
         }
 
         public void Add(Int32 key, Int32 value)

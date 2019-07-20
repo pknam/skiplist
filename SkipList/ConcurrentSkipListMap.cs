@@ -6,7 +6,7 @@ namespace SkipList
     // todo: implement IDictionary<TKey, TValue>, ICollection<KeyValuePair<TKey, TValue>>, IEnumerable<KeyValuePair<TKey, TValue>, IEnumerable
     public class ConcurrentSkipListMap
     {
-        public static Int32 MAX_FORWARD_LENGTH = 20;
+        public static readonly Int32 MAX_FORWARD_LENGTH = 20;
 
         private readonly Double p;
         private readonly Random random;

@@ -83,12 +83,17 @@ namespace SkipList.Test
 
         private void AddItems_0_to_1000(ConcurrentSkipListMap skipList)
         {
-            for (var i = 0; i < 1000; i += 2)
+            for (var i = 0; i < 1000; i += 3)
             {
                 skipList.Add(i, i + 1);
             }
 
-            for (var i = 1; i < 1000; i += 2)
+            for (var i = 1; i < 1000; i += 3)
+            {
+                skipList.Add(i, i + 1);
+            }
+
+            for (var i = 2; i < 1000; i += 3)
             {
                 skipList.Add(i, i + 1);
             }

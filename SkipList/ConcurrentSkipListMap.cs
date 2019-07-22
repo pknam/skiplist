@@ -255,8 +255,30 @@ namespace SkipList
 
         public void CopyTo(KeyValuePair<TKey, TValue>[] array, int arrayIndex)
         {
-            // todo: support indexed skip list
-            throw new NotImplementedException();
+            if (array == null)
+            {
+                throw new ArgumentNullException(nameof(array));
+            }
+
+            if (arrayIndex < 0 || array.Length <= arrayIndex)
+            {
+                throw new ArgumentOutOfRangeException(nameof(arrayIndex));
+            }
+
+            if (array.Length - arrayIndex < _count)
+            {
+                throw new ArgumentException();
+            }
+
+            if (array.Rank != 1)
+            {
+                throw new ArgumentException(nameof(array));
+            }
+
+            foreach (var node in this)
+            {
+                array[arrayIndex++] = new KeyValuePair<TKey, TValue>(node.Key, node.Value);
+            }
         }
 
         public bool Remove(KeyValuePair<TKey, TValue> item)

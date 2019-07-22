@@ -54,10 +54,7 @@ namespace SkipList
 
         public void Add(Int32 key, Int32 value)
         {
-            var forwardLength = NewForwardLength();
-            var newNode = new ConcurrentSkipListMapNode(forwardLength) { Key = key, Value = value };
             var backlook = GenerateInitialBacklook();
-
             var nextIndex = TraverseNextStep(_head.Forwards, key);
             IConcurrentSkipListMapNode traverseNode = _head;
 
@@ -83,6 +80,8 @@ namespace SkipList
                 backlook[i] = traverseNode;
             }
 
+            var forwardLength = NewForwardLength();
+            var newNode = new ConcurrentSkipListMapNode(forwardLength) { Key = key, Value = value };
             for (var i = 0; i < forwardLength; i++)
             {
                 var prevNode = backlook[i];

@@ -182,7 +182,6 @@ namespace SkipList
             {
                 if (Math.Pow(_p, length) < r)
                 {
-                    Console.WriteLine(length);
                     return length;
                 }
             }

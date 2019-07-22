@@ -1,11 +1,13 @@
 ﻿using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.Diagnostics;
 
 namespace SkipList
 {
     // todo: support concurrency
     // todo: implement IDictionary<TKey, TValue>, ICollection<KeyValuePair<TKey, TValue>>, IEnumerable<KeyValuePair<TKey, TValue>, IEnumerable
-    public class ConcurrentSkipListMap
+    public class ConcurrentSkipListMap : IEnumerable<KeyValuePair<Int32, Int32>>
     {
         public static readonly Int32 MAX_FORWARD_LENGTH = 20;
         private readonly Double _p;
@@ -199,5 +201,57 @@ namespace SkipList
 
             return backlook;
         }
+
+        #region Enumerator
+        public IEnumerator<KeyValuePair<int, int>> GetEnumerator()
+        {
+            return new Enumerator(this);
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return new Enumerator(this);
+        }
+
+        public struct Enumerator : IEnumerator<KeyValuePair<Int32, Int32>>, IEnumerator
+        {
+            private readonly ConcurrentSkipListMap _skipListMap;
+            private ConcurrentSkipListMapNode _currentNode;
+            private KeyValuePair<Int32, Int32> _current;
+
+            internal Enumerator(ConcurrentSkipListMap skipListMap)
+            {
+                _skipListMap = skipListMap;
+                _currentNode = _skipListMap._head;
+                _current = new KeyValuePair<int, int>();
+            }
+
+            public bool MoveNext()
+            {
+                if (_currentNode.Forwards[0] != null)
+                {
+                    _currentNode = _currentNode.Forwards[0];
+                    _current = new KeyValuePair<int, int>(_currentNode.Key, _currentNode.Value);
+                    return true;
+                }
+
+                _currentNode = default;
+                _current = new KeyValuePair<int, int>();
+                return false;
+            }
+
+            public void Reset()
+            {
+                _currentNode = _skipListMap._head;
+                _current = new KeyValuePair<int, int>();
+            }
+
+            public KeyValuePair<int, int> Current => _current;
+
+            object IEnumerator.Current => _current;
+
+            public void Dispose() { }
+        }
+        #endregion
     }
 }

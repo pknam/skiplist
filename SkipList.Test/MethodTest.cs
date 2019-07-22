@@ -9,7 +9,7 @@ namespace SkipList.Test
         [TestMethod]
         public void Add_Success()
         {
-            var skipList = new ConcurrentSkipListMap();
+            var skipList = new ConcurrentSkipListMap<Int32, Int32>();
             AddItems_0_to_1000(skipList);
             Assert.AreEqual(1000, skipList.Count);
         }
@@ -17,14 +17,14 @@ namespace SkipList.Test
         [TestMethod]
         public void IsReadOnly_Success()
         {
-            var skipList = new ConcurrentSkipListMap();
+            var skipList = new ConcurrentSkipListMap<Int32, Int32>();
             Assert.IsFalse(skipList.IsReadOnly);
         }
 
         [TestMethod]
         public void GetAllItems_Success()
         {
-            var skipList = new ConcurrentSkipListMap();
+            var skipList = new ConcurrentSkipListMap<Int32, Int32>();
             AddItems_0_to_1000(skipList);
 
             Int32 value;
@@ -38,7 +38,7 @@ namespace SkipList.Test
         [TestMethod]
         public void GetNotExists_Fail()
         {
-            var skipList = new ConcurrentSkipListMap();
+            var skipList = new ConcurrentSkipListMap<Int32, Int32>();
             AddItems_0_to_1000(skipList);
 
             Assert.IsFalse(skipList.TryGetValue(1234, out var value));
@@ -47,7 +47,7 @@ namespace SkipList.Test
         [TestMethod]
         public void DuplicateKey_Exception()
         {
-            var skipList = new ConcurrentSkipListMap();
+            var skipList = new ConcurrentSkipListMap<Int32, Int32>();
             skipList.Add(1, 1);
 
             Assert.ThrowsException<ArgumentException>(() =>
@@ -59,7 +59,7 @@ namespace SkipList.Test
         [TestMethod]
         public void ContainsKey_Success()
         {
-            var skipList = new ConcurrentSkipListMap();
+            var skipList = new ConcurrentSkipListMap<Int32, Int32>();
             AddItems_0_to_1000(skipList);
 
             for (var i = 0; i < 1000; i++)
@@ -71,7 +71,7 @@ namespace SkipList.Test
         [TestMethod]
         public void ContainsKey_Fail()
         {
-            var skipList = new ConcurrentSkipListMap();
+            var skipList = new ConcurrentSkipListMap<Int32, Int32>();
             AddItems_0_to_1000(skipList);
 
             Assert.IsFalse(skipList.ContainsKey(-2));
@@ -84,7 +84,7 @@ namespace SkipList.Test
         [TestMethod]
         public void RemoveBoundary_Fail()
         {
-            var skipList = new ConcurrentSkipListMap();
+            var skipList = new ConcurrentSkipListMap<Int32, Int32>();
             AddItems_0_to_1000(skipList);
 
             Assert.IsFalse(skipList.Remove(-3));
@@ -98,7 +98,7 @@ namespace SkipList.Test
         [TestMethod]
         public void Remove_Success()
         {
-            var skipList = new ConcurrentSkipListMap();
+            var skipList = new ConcurrentSkipListMap<Int32, Int32>();
             AddItems_0_to_1000(skipList);
 
             var oldLength = skipList.Count;
@@ -120,7 +120,7 @@ namespace SkipList.Test
         [TestMethod]
         public void AddRemove_Success()
         {
-            var skipList = new ConcurrentSkipListMap();
+            var skipList = new ConcurrentSkipListMap<Int32, Int32>();
             skipList.Add(3, 3);
             skipList.Add(1, 1);
             skipList.Add(10, 10);
@@ -151,7 +151,7 @@ namespace SkipList.Test
             Assert.IsFalse(skipList.Remove(1));
         }
 
-        private void AddItems_0_to_1000(ConcurrentSkipListMap skipList)
+        private void AddItems_0_to_1000(ConcurrentSkipListMap<Int32, Int32> skipList)
         {
             for (var i = 0; i < 1000; i += 3)
             {

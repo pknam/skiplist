@@ -1,4 +1,5 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System;
 using System.Linq;
 
 namespace SkipList.Test
@@ -9,7 +10,7 @@ namespace SkipList.Test
         [TestMethod]
         public void Foreach_Success()
         {
-            var skipList = new ConcurrentSkipListMap();
+            var skipList = new ConcurrentSkipListMap<Int32, Int32>();
             var items = new[] { 1, 5, 10, 7, 100, 54, 23, 86 };
             foreach (var item in items)
             {

@@ -2,16 +2,15 @@
 
 namespace SkipList
 {
-    // todo: implement KeyValuePair<TKey, TValue>
-    internal class ConcurrentSkipListMapNode
+    internal class ConcurrentSkipListMapNode<TKey, TValue>
     {
-        public Int32 Key { get; set; }
-        public Int32 Value { get; set; }
-        public ConcurrentSkipListMapNode[] Forwards { get; set; }
+        public TKey Key { get; set; }
+        public TValue Value { get; set; }
+        public ConcurrentSkipListMapNode<TKey, TValue>[] Forwards { get; set; }
 
         public ConcurrentSkipListMapNode(Int32 forwardLength)
         {
-            Forwards = new ConcurrentSkipListMapNode[forwardLength];
+            Forwards = new ConcurrentSkipListMapNode<TKey, TValue>[forwardLength];
         }
     }
 }

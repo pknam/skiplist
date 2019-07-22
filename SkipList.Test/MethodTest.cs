@@ -11,6 +11,14 @@ namespace SkipList.Test
         {
             var skipList = new ConcurrentSkipListMap();
             AddItems_0_to_1000(skipList);
+            Assert.AreEqual(1000, skipList.Count);
+        }
+
+        [TestMethod]
+        public void IsReadOnly_Success()
+        {
+            var skipList = new ConcurrentSkipListMap();
+            Assert.IsFalse(skipList.IsReadOnly);
         }
 
         [TestMethod]

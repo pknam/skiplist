@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 
 namespace SkipList
 {
@@ -7,21 +8,32 @@ namespace SkipList
     public class ConcurrentSkipListMap
     {
         public static readonly Int32 MAX_FORWARD_LENGTH = 20;
-
-        private readonly Double p;
-        private readonly Random random;
-        private readonly ConcurrentSkipListMapHeadNode head;
+        private readonly Double _p;
+        private readonly Random _random;
+        private readonly ConcurrentSkipListMapHeadNode _head;
 
         public ConcurrentSkipListMap(Double p = 0.5)
         {
-            this.p = p;
-            random = new Random(0x0d0ffFED);
-            head = new ConcurrentSkipListMapHeadNode(MAX_FORWARD_LENGTH);
+            this._p = p;
+            _random = new Random(0x0d0ffFED);
+            _head = new ConcurrentSkipListMapHeadNode(MAX_FORWARD_LENGTH);
         }
+
+        private Int32 _count = 0;
+        public Int32 Count
+        {
+            get
+            {
+                Debug.Assert(0 <= _count);
+                return _count;
+            }
+        }
+
+        public Boolean IsReadOnly => false;
 
         public Boolean TryGetValue(Int32 key, out Int32 value)
         {
-            IConcurrentSkipListMapNode traverseNode = head;
+            IConcurrentSkipListMapNode traverseNode = _head;
             var nextIndex = TraverseNextStep(traverseNode.Forwards, key);
             while (nextIndex != null)
             {
@@ -46,8 +58,8 @@ namespace SkipList
             var newNode = new ConcurrentSkipListMapNode(forwardLength) { Key = key, Value = value };
             var backlook = GenerateInitialBacklook();
 
-            var nextIndex = TraverseNextStep(head.Forwards, key);
-            IConcurrentSkipListMapNode traverseNode = head;
+            var nextIndex = TraverseNextStep(_head.Forwards, key);
+            IConcurrentSkipListMapNode traverseNode = _head;
 
             while (nextIndex != null)
             {
@@ -79,6 +91,8 @@ namespace SkipList
                 newNode.Forwards[i] = nextNode;
                 prevNode.Forwards[i] = newNode;
             }
+
+            _count++;
         }
 
         public bool Remove(Int32 key)
@@ -112,11 +126,11 @@ namespace SkipList
 
         private Int32 NewForwardLength()
         {
-            var r = random.NextDouble();
+            var r = _random.NextDouble();
 
             for (var length = 1; length <= MAX_FORWARD_LENGTH; length++)
             {
-                if (Math.Pow(p, length) < r)
+                if (Math.Pow(_p, length) < r)
                 {
                     Console.WriteLine(length);
                     return length;
@@ -128,10 +142,10 @@ namespace SkipList
 
         private IConcurrentSkipListMapNode[] GenerateInitialBacklook()
         {
-            var backlook = new IConcurrentSkipListMapNode[head.Forwards.Length];
+            var backlook = new IConcurrentSkipListMapNode[_head.Forwards.Length];
             for (var i = 0; i < backlook.Length; i++)
             {
-                backlook[i] = head;
+                backlook[i] = _head;
             }
 
             return backlook;

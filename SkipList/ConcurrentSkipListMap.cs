@@ -96,7 +96,58 @@ namespace SkipList
 
         public bool Remove(Int32 key)
         {
-            // todo
+            if (_count == 0)
+            {
+                return false;
+            }
+
+            var backlook = GenerateInitialBacklook();
+            var nextIndex = TraverseNextStep(_head.Forwards, key);
+            IConcurrentSkipListMapNode traverseNode = _head;
+
+            Boolean found = false;
+            while (nextIndex != null)
+            {
+                for (var i = nextIndex.Value; i < traverseNode.Forwards.Length; i++)
+                {
+                    backlook[i] = traverseNode;
+                }
+
+                traverseNode = traverseNode.Forwards[nextIndex.Value];
+
+                var traverseNodeKey = (traverseNode as ConcurrentSkipListMapNode).Key;
+                if (traverseNodeKey == key)
+                {
+                    found = true;
+                    break;
+                }
+                else if (key < traverseNodeKey)
+                {
+                    return false;
+                }
+
+                nextIndex = TraverseNextStep(traverseNode.Forwards, key);
+            }
+
+            if (found == false)
+            {
+                return false;
+            }
+
+            var foundNode = traverseNode;
+            var prevNode = backlook[nextIndex.Value];
+
+            for (var i = 0; i < nextIndex.Value; i++)
+            {
+                backlook[i] = prevNode;
+            }
+
+            for (var i = 0; i < foundNode.Forwards.Length; i++)
+            {
+                backlook[i].Forwards[i] = foundNode.Forwards[i];
+            }
+
+            _count--;
             return true;
         }
 

@@ -81,6 +81,76 @@ namespace SkipList.Test
             Assert.IsFalse(skipList.ContainsKey(1123123));
         }
 
+        [TestMethod]
+        public void RemoveBoundary_Fail()
+        {
+            var skipList = new ConcurrentSkipListMap();
+            AddItems_0_to_1000(skipList);
+
+            Assert.IsFalse(skipList.Remove(-3));
+            Assert.IsFalse(skipList.Remove(-2));
+            Assert.IsFalse(skipList.Remove(-1));
+            Assert.IsFalse(skipList.Remove(1000));
+            Assert.IsFalse(skipList.Remove(1001));
+            Assert.IsFalse(skipList.Remove(1002));
+        }
+
+        [TestMethod]
+        public void Remove_Success()
+        {
+            var skipList = new ConcurrentSkipListMap();
+            AddItems_0_to_1000(skipList);
+
+            var oldLength = skipList.Count;
+            var toRemoveItems = new[] { 2, 934, 54, 19, 245, 512, 777, 13};
+
+            foreach (var item in toRemoveItems)
+            {
+                Assert.IsTrue(skipList.Remove(item));
+            }
+
+            Assert.AreEqual(oldLength - toRemoveItems.Length, skipList.Count);
+
+            foreach (var item in toRemoveItems)
+            {
+                Assert.IsFalse(skipList.ContainsKey(item));
+            }
+        }
+
+        [TestMethod]
+        public void AddRemove_Success()
+        {
+            var skipList = new ConcurrentSkipListMap();
+            skipList.Add(3, 3);
+            skipList.Add(1, 1);
+            skipList.Add(10, 10);
+
+            Assert.IsFalse(skipList.Remove(0));
+            Assert.IsFalse(skipList.Remove(2));
+            Assert.IsFalse(skipList.Remove(6));
+            Assert.IsFalse(skipList.Remove(20));
+
+            Assert.IsTrue(skipList.Remove(10));
+            Assert.IsTrue(skipList.ContainsKey(1));
+            Assert.IsTrue(skipList.ContainsKey(3));
+            Assert.IsFalse(skipList.ContainsKey(10));
+            Assert.AreEqual(2, skipList.Count);
+
+            Assert.IsTrue(skipList.Remove(1));
+            Assert.IsFalse(skipList.ContainsKey(1));
+            Assert.IsTrue(skipList.ContainsKey(3));
+            Assert.IsFalse(skipList.ContainsKey(10));
+            Assert.AreEqual(1, skipList.Count);
+
+            Assert.IsTrue(skipList.Remove(3));
+            Assert.IsFalse(skipList.ContainsKey(1));
+            Assert.IsFalse(skipList.ContainsKey(3));
+            Assert.IsFalse(skipList.ContainsKey(10));
+            Assert.AreEqual(0, skipList.Count);
+
+            Assert.IsFalse(skipList.Remove(1));
+        }
+
         private void AddItems_0_to_1000(ConcurrentSkipListMap skipList)
         {
             for (var i = 0; i < 1000; i += 3)

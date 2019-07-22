@@ -62,7 +62,22 @@ namespace SkipList.Test
             var skipList = new ConcurrentSkipListMap();
             AddItems_0_to_1000(skipList);
 
-            Assert.IsTrue(skipList.ContainsKey(10));
+            for (var i = 0; i < 1000; i++)
+            {
+                Assert.IsTrue(skipList.ContainsKey(i));
+            }
+        }
+
+        [TestMethod]
+        public void ContainsKey_Fail()
+        {
+            var skipList = new ConcurrentSkipListMap();
+            AddItems_0_to_1000(skipList);
+
+            Assert.IsFalse(skipList.ContainsKey(-2));
+            Assert.IsFalse(skipList.ContainsKey(-1));
+            Assert.IsFalse(skipList.ContainsKey(1000));
+            Assert.IsFalse(skipList.ContainsKey(1001));
             Assert.IsFalse(skipList.ContainsKey(1123123));
         }
 

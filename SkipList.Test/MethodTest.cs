@@ -15,13 +15,6 @@ namespace SkipList.Test
         }
 
         [TestMethod]
-        public void IsReadOnly_Success()
-        {
-            var skipList = new ConcurrentSkipListMap<Int32, Int32>();
-            Assert.IsFalse(skipList.IsReadOnly);
-        }
-
-        [TestMethod]
         public void GetAllItems_Success()
         {
             var skipList = new ConcurrentSkipListMap<Int32, Int32>();

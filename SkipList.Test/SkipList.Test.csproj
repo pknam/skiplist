@@ -49,6 +49,7 @@
     <Reference Include="System.Core" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CollectionTest.cs" />
     <Compile Include="EnumeratorTest.cs" />
     <Compile Include="MethodTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

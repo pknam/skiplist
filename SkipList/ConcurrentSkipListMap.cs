@@ -6,14 +6,14 @@ using System.Diagnostics;
 namespace SkipList
 {
     // todo: support concurrency
-    // todo: implement IDictionary<TKey, TValue>, ICollection<KeyValuePair<TKey, TValue>>
-    public class ConcurrentSkipListMap<TKey, TValue> : IEnumerable<KeyValuePair<TKey, TValue>>, IEnumerable
+    public class ConcurrentSkipListMap<TKey, TValue> : IEnumerable<KeyValuePair<TKey, TValue>>, IEnumerable, ICollection<KeyValuePair<TKey, TValue>>
     {
         public static readonly Int32 MAX_FORWARD_LENGTH = 20;
         private readonly Double _p;
         private readonly Random _random;
         private readonly ConcurrentSkipListMapHeadNode<TKey, TValue> _head;
         private readonly IComparer<TKey> _comparer;
+        private Int32 _count = 0;
 
         public ConcurrentSkipListMap()
             : this((IComparer<TKey>)null)
@@ -37,17 +37,6 @@ namespace SkipList
             }
         }
 
-        private Int32 _count = 0;
-        public Int32 Count
-        {
-            get
-            {
-                Debug.Assert(0 <= _count);
-                return _count;
-            }
-        }
-
-        public Boolean IsReadOnly => false;
 
         public Boolean TryGetValue(TKey key, out TValue value)
         {
@@ -114,59 +103,7 @@ namespace SkipList
 
         public bool Remove(TKey key)
         {
-            if (_count == 0)
-            {
-                return false;
-            }
-
-            ConcurrentSkipListMapNode<TKey, TValue> traverseNode = _head;
-            var backlook = GenerateInitialBacklook();
-            var nextIndex = TraverseNextStep(traverseNode.Forwards, key);
-            Boolean found = false;
-
-            while (nextIndex != null)
-            {
-                for (var i = nextIndex.Value; i < traverseNode.Forwards.Length; i++)
-                {
-                    backlook[i] = traverseNode;
-                }
-
-                traverseNode = traverseNode.Forwards[nextIndex.Value];
-
-                var traverseNodeKey = (traverseNode as ConcurrentSkipListMapNode<TKey, TValue>).Key;
-                if (_comparer.Compare(traverseNodeKey, key) == 0)
-                {
-                    found = true;
-                    break;
-                }
-                else if (_comparer.Compare(key, traverseNodeKey) < 0)
-                {
-                    return false;
-                }
-
-                nextIndex = TraverseNextStep(traverseNode.Forwards, key);
-            }
-
-            if (found == false)
-            {
-                return false;
-            }
-
-            var foundNode = traverseNode;
-            var prevNode = backlook[nextIndex.Value];
-
-            for (var i = 0; i < nextIndex.Value; i++)
-            {
-                backlook[i] = prevNode;
-            }
-
-            for (var i = 0; i < foundNode.Forwards.Length; i++)
-            {
-                backlook[i].Forwards[i] = foundNode.Forwards[i];
-            }
-
-            _count--;
-            return true;
+            return RemoveInternal(key, false, default);
         }
 
         public bool ContainsKey(TKey key)
@@ -197,6 +134,68 @@ namespace SkipList
             return null;
         }
 
+        private bool RemoveInternal(TKey key, Boolean matchValue, TValue value)
+        {
+            if (_count == 0)
+            {
+                return false;
+            }
+
+            ConcurrentSkipListMapNode<TKey, TValue> traverseNode = _head;
+            var backlook = GenerateInitialBacklook();
+            var nextIndex = TraverseNextStep(traverseNode.Forwards, key);
+            Boolean found = false;
+
+            while (nextIndex != null)
+            {
+                for (var i = nextIndex.Value; i < traverseNode.Forwards.Length; i++)
+                {
+                    backlook[i] = traverseNode;
+                }
+
+                traverseNode = traverseNode.Forwards[nextIndex.Value];
+
+                var node = traverseNode as ConcurrentSkipListMapNode<TKey, TValue>;
+                if (_comparer.Compare(node.Key, key) == 0)
+                {
+                    if (matchValue && EqualityComparer<TValue>.Default.Equals(node.Value, value) == false)
+                    {
+                        return false;
+                    }
+
+                    found = true;
+                    break;
+                }
+                else if (_comparer.Compare(key, node.Key) < 0)
+                {
+                    return false;
+                }
+
+                nextIndex = TraverseNextStep(traverseNode.Forwards, key);
+            }
+
+            if (found == false)
+            {
+                return false;
+            }
+
+            var foundNode = traverseNode;
+            var prevNode = backlook[nextIndex.Value];
+
+            for (var i = 0; i < nextIndex.Value; i++)
+            {
+                backlook[i] = prevNode;
+            }
+
+            for (var i = 0; i < foundNode.Forwards.Length; i++)
+            {
+                backlook[i].Forwards[i] = foundNode.Forwards[i];
+            }
+
+            _count--;
+            return true;
+        }
+
         private Int32 NewForwardLength()
         {
             var r = _random.NextDouble();
@@ -222,6 +221,52 @@ namespace SkipList
 
             return backlook;
         }
+
+        #region Collection
+        public Boolean IsReadOnly => false;
+
+        public Int32 Count
+        {
+            get
+            {
+                Debug.Assert(0 <= _count);
+                return _count;
+            }
+        }
+
+        public void Add(KeyValuePair<TKey, TValue> item)
+        {
+            Add(item.Key, item.Value);
+        }
+
+        public void Clear()
+        {
+            for (var i = 0; i < _head.Forwards.Length; i++)
+            {
+                _head.Forwards[i] = null;
+            }
+
+            _count = 0;
+        }
+
+        public bool Contains(KeyValuePair<TKey, TValue> item)
+        {
+            return
+                TryGetValue(item.Key, out var value) &&
+                EqualityComparer<TValue>.Default.Equals(value, item.Value);
+        }
+
+        public void CopyTo(KeyValuePair<TKey, TValue>[] array, int arrayIndex)
+        {
+            // todo: support indexed skip list
+            throw new NotImplementedException();
+        }
+
+        public bool Remove(KeyValuePair<TKey, TValue> item)
+        {
+            return RemoveInternal(item.Key, true, item.Value);
+        }
+        #endregion
 
         #region Enumerator
         public IEnumerator<KeyValuePair<TKey, TValue>> GetEnumerator()

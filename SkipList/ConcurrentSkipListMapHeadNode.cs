@@ -2,13 +2,14 @@
 
 namespace SkipList
 {
-    class ConcurrentSkipListMapHeadNode : IConcurrentSkipListMapNode
+    internal class ConcurrentSkipListMapHeadNode : ConcurrentSkipListMapNode
     {
-        public ConcurrentSkipListMapNode[] Forwards { get; set; }
+        public new Int32 Key => throw new NotImplementedException();
+        public new Int32 Value => throw new NotImplementedException();
 
-        public ConcurrentSkipListMapHeadNode(Int32 forwardSize)
+        public ConcurrentSkipListMapHeadNode(Int32 forwardLength)
+            :base(forwardLength)
         {
-            Forwards = new ConcurrentSkipListMapNode[forwardSize];
         }
     }
 }

@@ -3,7 +3,7 @@
 namespace SkipList
 {
     // todo: implement KeyValuePair<TKey, TValue>
-    internal class ConcurrentSkipListMapNode : IConcurrentSkipListMapNode
+    internal class ConcurrentSkipListMapNode
     {
         public Int32 Key { get; set; }
         public Int32 Value { get; set; }

@@ -23,7 +23,7 @@ namespace SkipList
 
         public ConcurrentSkipListMap(IComparer<TKey> comparer, Double p = 0.5)
         {
-            this._p = p;
+            _p = p;
             _random = new Random(0x0d0ffFED);
             _head = new ConcurrentSkipListMapHeadNode<TKey, TValue>(MAX_FORWARD_LENGTH);
 
@@ -36,7 +36,6 @@ namespace SkipList
                 _comparer = comparer;
             }
         }
-
 
         public Boolean TryGetValue(TKey key, out TValue value)
         {
@@ -154,11 +153,9 @@ namespace SkipList
                 }
 
                 traverseNode = traverseNode.Forwards[nextIndex.Value];
-
-                var node = traverseNode as ConcurrentSkipListMapNode<TKey, TValue>;
-                if (_comparer.Compare(node.Key, key) == 0)
+                if (_comparer.Compare(traverseNode.Key, key) == 0)
                 {
-                    if (matchValue && EqualityComparer<TValue>.Default.Equals(node.Value, value) == false)
+                    if (matchValue && EqualityComparer<TValue>.Default.Equals(traverseNode.Value, value) == false)
                     {
                         return false;
                     }
@@ -166,7 +163,7 @@ namespace SkipList
                     found = true;
                     break;
                 }
-                else if (_comparer.Compare(key, node.Key) < 0)
+                else if (_comparer.Compare(key, traverseNode.Key) < 0)
                 {
                     return false;
                 }

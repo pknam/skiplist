@@ -60,6 +60,11 @@ namespace SkipList
 
         public void Add(TKey key, TValue value)
         {
+            if (key == null)
+            {
+                throw new ArgumentNullException(nameof(key));
+            }
+
             ConcurrentSkipListMapNode<TKey, TValue> traverseNode = _head;
             var backlook = GenerateInitialBacklook();
             var nextIndex = TraverseNextStep(_head.Forwards, key);

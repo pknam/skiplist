@@ -66,7 +66,7 @@ namespace SkipList
             }
 
             ConcurrentSkipListMapNode<TKey, TValue> traverseNode = _head;
-            var backlook = GenerateInitialBacklook();
+            var backlook = new ConcurrentSkipListMapNode<TKey, TValue>[_head.Forwards.Length];
             var nextIndex = TraverseNextStep(_head.Forwards, key);
 
             while (nextIndex != null)
@@ -146,7 +146,7 @@ namespace SkipList
             }
 
             ConcurrentSkipListMapNode<TKey, TValue> traverseNode = _head;
-            var backlook = GenerateInitialBacklook();
+            var backlook = new ConcurrentSkipListMapNode<TKey, TValue>[_head.Forwards.Length];
             var nextIndex = TraverseNextStep(traverseNode.Forwards, key);
             Boolean found = false;
 
@@ -211,17 +211,6 @@ namespace SkipList
             }
 
             return MAX_FORWARD_LENGTH;
-        }
-
-        private ConcurrentSkipListMapNode<TKey, TValue>[] GenerateInitialBacklook()
-        {
-            var backlook = new ConcurrentSkipListMapNode<TKey, TValue>[_head.Forwards.Length];
-            for (var i = 0; i < backlook.Length; i++)
-            {
-                backlook[i] = _head;
-            }
-
-            return backlook;
         }
 
         #region Collection

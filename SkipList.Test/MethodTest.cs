@@ -1,4 +1,4 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 
 namespace SkipList.Test
@@ -95,7 +95,7 @@ namespace SkipList.Test
             AddItems_0_to_1000(skipList);
 
             var oldLength = skipList.Count;
-            var toRemoveItems = new[] { 2, 934, 54, 19, 245, 512, 777, 13};
+            var toRemoveItems = new[] { 2, 934, 54, 19, 245, 512, 777, 13 };
 
             foreach (var item in toRemoveItems)
             {

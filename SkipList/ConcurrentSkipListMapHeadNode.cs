@@ -8,7 +8,7 @@ namespace SkipList
         public new TValue Value => throw new NotImplementedException();
 
         public ConcurrentSkipListMapHeadNode(Int32 forwardLength)
-            :base(forwardLength)
+            : base(forwardLength)
         {
         }
     }

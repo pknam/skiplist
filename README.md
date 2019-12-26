@@ -7,3 +7,13 @@
     - [.Net Core Test Explorer Extension](https://marketplace.visualstudio.com/items?itemName=formulahendry.dotnet-test-explorer)
 - Visual Studio 2019
     - version over 16.3.5
+
+# Build
+```
+$ dotnet build
+```
+
+# Test
+```
+$ dotnet test
+```

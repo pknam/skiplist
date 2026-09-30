@@ -43,7 +43,7 @@ namespace SkipList.Test
             var skipList = new ConcurrentSkipListMap<Int32, Int32>();
             skipList.Add(1, 1);
 
-            Assert.ThrowsException<ArgumentException>(() =>
+            Assert.ThrowsExactly<ArgumentException>(() =>
             {
                 skipList.Add(1, 1);
             });

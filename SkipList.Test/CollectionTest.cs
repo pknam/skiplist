@@ -56,28 +56,28 @@ namespace SkipList.Test
             };
 
             KeyValuePair<Int32, Int32>[] targetArray_null = null;
-            Assert.ThrowsException<ArgumentNullException>(() =>
+            Assert.ThrowsExactly<ArgumentNullException>(() =>
             {
                 skipList.CopyTo(targetArray_null, 0);
             });
 
             var targetArray = new KeyValuePair<Int32, Int32>[4];
-            Assert.ThrowsException<ArgumentException>(() =>
+            Assert.ThrowsExactly<ArgumentException>(() =>
             {
                 skipList.CopyTo(targetArray, 3);
             });
 
-            Assert.ThrowsException<ArgumentOutOfRangeException>(() =>
+            Assert.ThrowsExactly<ArgumentOutOfRangeException>(() =>
             {
                 skipList.CopyTo(targetArray, -11);
             });
 
-            Assert.ThrowsException<ArgumentOutOfRangeException>(() =>
+            Assert.ThrowsExactly<ArgumentOutOfRangeException>(() =>
             {
                 skipList.CopyTo(targetArray, targetArray.Length);
             });
 
-            Assert.ThrowsException<ArgumentOutOfRangeException>(() =>
+            Assert.ThrowsExactly<ArgumentOutOfRangeException>(() =>
             {
                 skipList.CopyTo(targetArray, targetArray.Length + 1);
             });
